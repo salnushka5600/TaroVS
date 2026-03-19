@@ -76,7 +76,7 @@ namespace TaroVS.ViewModels
             set { _selectedOrderProduct = value; OnPropertyChanged(); }
         }
 
-        // Товары
+        
         private string _newProductName = "";
         public string NewProductName
         {
@@ -112,7 +112,7 @@ namespace TaroVS.ViewModels
             set { _newProductStock = value; OnPropertyChanged(); }
         }
 
-        // Клиенты
+        
         private string _newCustomerName = "";
         public string NewCustomerName
         {
@@ -134,7 +134,7 @@ namespace TaroVS.ViewModels
             set { _newCustomerEmail = value; OnPropertyChanged(); }
         }
 
-        // Заказ
+       
         private int _newOrderQuantity = 1;
         public int NewOrderQuantity
         {
@@ -184,7 +184,7 @@ namespace TaroVS.ViewModels
             set { _selectedNextStatus = value; OnPropertyChanged(); }
         }
 
-        // Dashboard
+       
         private string _dashboardText = "";
         public string DashboardText
         {
@@ -192,7 +192,7 @@ namespace TaroVS.ViewModels
             set { _dashboardText = value; OnPropertyChanged(); }
         }
 
-        // Отчёт
+       
         private DateTime _reportFrom = DateTime.Today.AddDays(-7);
         public DateTime ReportFrom
         {
@@ -214,7 +214,7 @@ namespace TaroVS.ViewModels
             set { _reportText = value; OnPropertyChanged(); }
         }
 
-        // Команды
+      
         public RelayCommand SeedDemoCommand { get; }
         public RelayCommand AddProductCommand { get; }
         public RelayCommand DeleteProductCommand { get; }
@@ -395,7 +395,7 @@ namespace TaroVS.ViewModels
                 return;
             }
 
-            // резервируем остаток при создании заказа
+         
             SelectedOrderProduct.Stock -= NewOrderQuantity;
 
             var total = SelectedOrderProduct.Price * NewOrderQuantity;
@@ -486,7 +486,7 @@ namespace TaroVS.ViewModels
                 return;
             }
 
-            // возвращаем резерв на склад
+           
             if (SelectedOrder.StockReserved && SelectedOrder.Product != null)
             {
                 SelectedOrder.Product.Stock += SelectedOrder.Quantity;
