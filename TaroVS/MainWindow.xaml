@@ -141,46 +141,100 @@
                     <Grid Margin="10">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
+                        <!-- Создание заказа -->
                         <Border Grid.Row="0" CornerRadius="14" Background="#FAFAFF" Padding="12" Margin="0,0,0,12">
                             <WrapPanel>
                                 <TextBlock Text="Клиент:" VerticalAlignment="Center" Margin="6"/>
-                                <ComboBox Width="240" Margin="6"
-                                          ItemsSource="{Binding Customers}"
-                                          SelectedItem="{Binding SelectedCustomer}"
-                                          DisplayMemberPath="FullName"/>
+                                <ComboBox Width="220" Margin="6"
+                          ItemsSource="{Binding Customers}"
+                          SelectedItem="{Binding SelectedCustomer}"
+                          DisplayMemberPath="FullName"/>
 
-                                <TextBlock Text="Сумма:" VerticalAlignment="Center" Margin="6"/>
-                                <TextBox Width="120" Margin="6" Text="{Binding NewOrderTotal}"/>
+                                <TextBlock Text="Товар:" VerticalAlignment="Center" Margin="6"/>
+                                <ComboBox Width="220" Margin="6"
+                          ItemsSource="{Binding Products}"
+                          SelectedItem="{Binding SelectedOrderProduct}"
+                          DisplayMemberPath="Name"/>
 
-                                <TextBlock Text="Статус:" VerticalAlignment="Center" Margin="6"/>
-                                <ComboBox Width="140" Margin="6" SelectedItem="{Binding NewOrderStatus}">
-                                    <ComboBoxItem Content="Новый"/>
-                                    <ComboBoxItem Content="В сборке"/>
-                                    <ComboBoxItem Content="Отправлен"/>
-                                    <ComboBoxItem Content="Закрыт"/>
-                                    <ComboBoxItem Content="Возврат"/>
-                                </ComboBox>
+                                <TextBlock Text="Кол-во:" VerticalAlignment="Center" Margin="6"/>
+                                <TextBox Width="70" Margin="6" Text="{Binding NewOrderQuantity}"/>
 
-                                <Button Content="Создать заказ" Margin="6" Padding="12,8"
-                                        Command="{Binding AddOrderCommand}"/>
+                                <TextBlock Text="Оплата:" VerticalAlignment="Center" Margin="6"/>
+                                <ComboBox Width="120" Margin="6"
+                          ItemsSource="{Binding PaymentMethods}"
+                          SelectedItem="{Binding NewOrderPayment}"/>
+
+                                <TextBlock Text="Доставка:" VerticalAlignment="Center" Margin="6"/>
+                                <ComboBox Width="130" Margin="6"
+                          ItemsSource="{Binding DeliveryMethods}"
+                          SelectedItem="{Binding NewOrderDelivery}"/>
+
+                                <Button Content="Создать заказ"
+                        Margin="6"
+                        Padding="12,8"
+                        Command="{Binding AddOrderCommand}"/>
                             </WrapPanel>
                         </Border>
 
-                        <DataGrid Grid.Row="1" ItemsSource="{Binding Orders}" AutoGenerateColumns="False"
-                                  SelectedItem="{Binding SelectedOrder}" CanUserAddRows="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
-                                <DataGridTextColumn Header="Дата" Binding="{Binding CreatedAt}" Width="160"/>
-                                <DataGridTextColumn Header="Клиент" Binding="{Binding Customer.FullName}" Width="220"/>
-                                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="120"/>
-                                <DataGridTextColumn Header="Оплата" Binding="{Binding Payment}" Width="120"/>
-                                <DataGridTextColumn Header="Доставка" Binding="{Binding Delivery}" Width="120"/>
-                                <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="120"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                        <!-- Доп поля -->
+                        <Border Grid.Row="1" CornerRadius="14" Background="#FAFAFF" Padding="12" Margin="0,0,0,12">
+                            <WrapPanel>
+                                <TextBlock Text="Комментарий:" VerticalAlignment="Center" Margin="6"/>
+                                <TextBox Width="240" Margin="6" Text="{Binding NewOrderComment}"/>
+
+                                <TextBlock Text="Документ/ссылка:" VerticalAlignment="Center" Margin="6"/>
+                                <TextBox Width="240" Margin="6" Text="{Binding NewOrderDocumentPath}"/>
+                            </WrapPanel>
+                        </Border>
+
+                        <!-- Таблица -->
+                        <Grid Grid.Row="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <DataGrid Grid.Row="0"
+                      ItemsSource="{Binding Orders}"
+                      AutoGenerateColumns="False"
+                      SelectedItem="{Binding SelectedOrder}"
+                      CanUserAddRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
+                                    <DataGridTextColumn Header="Дата" Binding="{Binding CreatedAt}" Width="150"/>
+                                    <DataGridTextColumn Header="Клиент" Binding="{Binding Customer.FullName}" Width="180"/>
+                                    <DataGridTextColumn Header="Товар" Binding="{Binding Product.Name}" Width="200"/>
+                                    <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="70"/>
+                                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="130"/>
+                                    <DataGridTextColumn Header="Оплата" Binding="{Binding Payment}" Width="100"/>
+                                    <DataGridTextColumn Header="Доставка" Binding="{Binding Delivery}" Width="110"/>
+                                    <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="100"/>
+                                    <DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" Width="180"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- Управление статусом -->
+                            <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="0,12,0,0">
+                                <TextBlock Text="Новый статус:" VerticalAlignment="Center" Margin="6"/>
+                                <ComboBox Width="150" Margin="6"
+                          ItemsSource="{Binding OrderStatuses}"
+                          SelectedItem="{Binding SelectedNextStatus}"/>
+
+                                <Button Content="Изменить статус"
+                        Margin="6"
+                        Padding="12,8"
+                        Command="{Binding ChangeOrderStatusCommand}"/>
+
+                                <Button Content="Отменить заказ"
+                        Margin="6"
+                        Padding="12,8"
+                        Command="{Binding CancelOrderCommand}"/>
+                            </WrapPanel>
+                        </Grid>
                     </Grid>
                 </TabItem>
 

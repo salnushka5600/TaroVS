@@ -11,9 +11,14 @@ namespace TaroVS.Models
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public Customer? Customer { get; set; }
+        public Product? Product { get; set; }
+        public int Quantity { get; set; }
         public string Status { get; set; } = "Новый";
         public string Payment { get; set; } = "Карта";
         public string Delivery { get; set; } = "Самовывоз";
         public decimal Total { get; set; }
+        public string Comment { get; set; } = "";
+        public string DocumentPath { get; set; } = "";
+        public bool StockReserved { get; set; } = false;
     }
 }
