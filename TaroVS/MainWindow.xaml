@@ -145,7 +145,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Создание заказа -->
+                       
                         <Border Grid.Row="0" CornerRadius="14" Background="#FAFAFF" Padding="12" Margin="0,0,0,12">
                             <WrapPanel>
                                 <TextBlock Text="Клиент:" VerticalAlignment="Center" Margin="6"/>
@@ -180,7 +180,7 @@
                             </WrapPanel>
                         </Border>
 
-                        <!-- Доп поля -->
+                       
                         <Border Grid.Row="1" CornerRadius="14" Background="#FAFAFF" Padding="12" Margin="0,0,0,12">
                             <WrapPanel>
                                 <TextBlock Text="Комментарий:" VerticalAlignment="Center" Margin="6"/>
@@ -191,7 +191,7 @@
                             </WrapPanel>
                         </Border>
 
-                        <!-- Таблица -->
+                      
                         <Grid Grid.Row="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
@@ -217,7 +217,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
 
-                            <!-- Управление статусом -->
+                          
                             <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="0,12,0,0">
                                 <TextBlock Text="Новый статус:" VerticalAlignment="Center" Margin="6"/>
                                 <ComboBox Width="150" Margin="6"
@@ -238,7 +238,7 @@
                     </Grid>
                 </TabItem>
 
-                <!-- Reports -->
+               
                 <TabItem Header="Отчёты">
                     <StackPanel Margin="10">
                         <TextBlock Text="Отчёт по продажам" FontSize="16" FontWeight="Bold" Margin="0,0,0,12"/>
