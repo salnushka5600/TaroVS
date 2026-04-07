@@ -17,24 +17,32 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
         <Border Grid.Row="0" CornerRadius="16" Background="White" Padding="14" Margin="0,0,0,12">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Left">
                     <TextBlock Text="ИС магазина карт Таро — MVP" FontSize="20" FontWeight="Bold" />
-                    <TextBlock Text="Простой прототип без базы данных (данные хранятся в памяти)" Foreground="#666" />
+                    <TextBlock Text="Локальная конфигурация: JSON-хранилище, автосохранение, ролевая модель" Foreground="#666" />
                 </StackPanel>
 
-                <Button DockPanel.Dock="Right" Content="Загрузить демо-данные"
-                        Padding="12,8" Margin="12,0,0,0"
-                        Command="{Binding SeedDemoCommand}"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Загрузить демо-данные"
+            Padding="12,8" Margin="12,0,0,0"
+            Command="{Binding SeedDemoCommand}"/>
+
+                    <Button Content="Сохранить данные"
+            Padding="12,8" Margin="12,0,0,0"
+            Command="{Binding SaveDataCommand}"/>
+
+                    <Button Content="Перезагрузить"
+            Padding="12,8" Margin="12,0,0,0"
+            Command="{Binding LoadDataCommand}"/>
+                </StackPanel>
+
             </DockPanel>
         </Border>
 
-        <!-- Content -->
         <Border Grid.Row="1" CornerRadius="16" Background="White" Padding="12">
             <TabControl>
-                <!-- Dashboard -->
                 <TabItem Header="Dashboard">
                     <Grid Margin="10">
                         <Grid.ColumnDefinitions>
@@ -70,7 +78,6 @@
                     </Grid>
                 </TabItem>
 
-                <!-- Products -->
                 <TabItem Header="Товары">
                     <Grid Margin="10">
                         <Grid.RowDefinitions>
@@ -106,7 +113,6 @@
                     </Grid>
                 </TabItem>
 
-                <!-- Customers -->
                 <TabItem Header="Клиенты">
                     <Grid Margin="10">
                         <Grid.RowDefinitions>
@@ -136,7 +142,6 @@
                     </Grid>
                 </TabItem>
 
-                <!-- Orders -->
                 <TabItem Header="Заказы">
                     <Grid Margin="10">
                         <Grid.RowDefinitions>

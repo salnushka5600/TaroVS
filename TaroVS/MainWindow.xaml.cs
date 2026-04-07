@@ -1,14 +1,5 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows;
+﻿using System.Windows;
+using TaroVS.Services;
 using TaroVS.ViewModels;
 
 namespace TaroVS
@@ -18,7 +9,13 @@ namespace TaroVS
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
+
+            var configService = new ConfigService();
+            var config = configService.LoadConfig();
+
+            var dataService = new JsonDataService(config);
+
+            DataContext = new MainViewModel(config, dataService);
         }
     }
 }

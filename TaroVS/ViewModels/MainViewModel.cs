@@ -7,11 +7,15 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using TaroVS.Commands;
 using TaroVS.Models;
+using TaroVS.Services;
 
 namespace TaroVS.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        private readonly AppConfig _config;
+        private readonly JsonDataService _dataService;
+
         public ObservableCollection<Product> Products { get; } = new();
         public ObservableCollection<Customer> Customers { get; } = new();
         public ObservableCollection<Order> Orders { get; } = new();
@@ -44,6 +48,47 @@ namespace TaroVS.ViewModels
         private int _customerId = 1;
         private int _orderId = 1;
 
+        public RelayCommand SeedDemoCommand { get; }
+        public RelayCommand SaveDataCommand { get; }
+        public RelayCommand LoadDataCommand { get; }
+        public RelayCommand AddProductCommand { get; }
+        public RelayCommand DeleteProductCommand { get; }
+        public RelayCommand AddCustomerCommand { get; }
+        public RelayCommand AddOrderCommand { get; }
+        public RelayCommand ChangeOrderStatusCommand { get; }
+        public RelayCommand CancelOrderCommand { get; }
+        public RelayCommand BuildReportCommand { get; }
+
+        public MainViewModel(AppConfig config, JsonDataService dataService)
+        {
+            _config = config;
+            _dataService = dataService;
+
+            SeedDemoCommand = new RelayCommand(_ => SeedDemo());
+            SaveDataCommand = new RelayCommand(_ => SaveAllData());
+            LoadDataCommand = new RelayCommand(_ => LoadAllData());
+
+            AddProductCommand = new RelayCommand(_ => AddProduct());
+            DeleteProductCommand = new RelayCommand(_ => DeleteProduct(), _ => SelectedProduct != null);
+
+            AddCustomerCommand = new RelayCommand(_ => AddCustomer());
+            AddOrderCommand = new RelayCommand(_ => AddOrder(), _ => Customers.Count > 0 && Products.Count > 0);
+
+            ChangeOrderStatusCommand = new RelayCommand(_ => ChangeOrderStatus(), _ => SelectedOrder != null);
+            CancelOrderCommand = new RelayCommand(_ => CancelOrder(), _ => SelectedOrder != null);
+
+            BuildReportCommand = new RelayCommand(_ => BuildReport());
+
+            LoadAllData();
+
+            if (_config.SeedDemoOnFirstRun && Products.Count == 0 && Customers.Count == 0 && Orders.Count == 0)
+            {
+                SeedDemo();
+            }
+        }
+
+        #region Selected Items
+
         private Product? _selectedProduct;
         public Product? SelectedProduct
         {
@@ -62,11 +107,7 @@ namespace TaroVS.ViewModels
         public Order? SelectedOrder
         {
             get => _selectedOrder;
-            set
-            {
-                _selectedOrder = value;
-                OnPropertyChanged();
-            }
+            set { _selectedOrder = value; OnPropertyChanged(); }
         }
 
         private Product? _selectedOrderProduct;
@@ -76,7 +117,10 @@ namespace TaroVS.ViewModels
             set { _selectedOrderProduct = value; OnPropertyChanged(); }
         }
 
-        
+        #endregion
+
+        #region Product Fields
+
         private string _newProductName = "";
         public string NewProductName
         {
@@ -112,7 +156,10 @@ namespace TaroVS.ViewModels
             set { _newProductStock = value; OnPropertyChanged(); }
         }
 
-        
+        #endregion
+
+        #region Customer Fields
+
         private string _newCustomerName = "";
         public string NewCustomerName
         {
@@ -134,19 +181,15 @@ namespace TaroVS.ViewModels
             set { _newCustomerEmail = value; OnPropertyChanged(); }
         }
 
-       
+        #endregion
+
+        #region Order Fields
+
         private int _newOrderQuantity = 1;
         public int NewOrderQuantity
         {
             get => _newOrderQuantity;
             set { _newOrderQuantity = value; OnPropertyChanged(); }
-        }
-
-        private string _newOrderStatus = "Новый";
-        public string NewOrderStatus
-        {
-            get => _newOrderStatus;
-            set { _newOrderStatus = value; OnPropertyChanged(); }
         }
 
         private string _newOrderPayment = "Карта";
@@ -184,7 +227,10 @@ namespace TaroVS.ViewModels
             set { _selectedNextStatus = value; OnPropertyChanged(); }
         }
 
-       
+        #endregion
+
+        #region Dashboard / Reports
+
         private string _dashboardText = "";
         public string DashboardText
         {
@@ -192,7 +238,6 @@ namespace TaroVS.ViewModels
             set { _dashboardText = value; OnPropertyChanged(); }
         }
 
-       
         private DateTime _reportFrom = DateTime.Today.AddDays(-7);
         public DateTime ReportFrom
         {
@@ -214,34 +259,9 @@ namespace TaroVS.ViewModels
             set { _reportText = value; OnPropertyChanged(); }
         }
 
-      
-        public RelayCommand SeedDemoCommand { get; }
-        public RelayCommand AddProductCommand { get; }
-        public RelayCommand DeleteProductCommand { get; }
-        public RelayCommand AddCustomerCommand { get; }
-        public RelayCommand AddOrderCommand { get; }
-        public RelayCommand ChangeOrderStatusCommand { get; }
-        public RelayCommand CancelOrderCommand { get; }
-        public RelayCommand BuildReportCommand { get; }
+        #endregion
 
-        public MainViewModel()
-        {
-            SeedDemoCommand = new RelayCommand(_ => SeedDemo());
-
-            AddProductCommand = new RelayCommand(_ => AddProduct());
-            DeleteProductCommand = new RelayCommand(_ => DeleteProduct(), _ => SelectedProduct != null);
-
-            AddCustomerCommand = new RelayCommand(_ => AddCustomer());
-
-            AddOrderCommand = new RelayCommand(_ => AddOrder(), _ => Customers.Count > 0 && Products.Count > 0);
-
-            ChangeOrderStatusCommand = new RelayCommand(_ => ChangeOrderStatus(), _ => SelectedOrder != null);
-            CancelOrderCommand = new RelayCommand(_ => CancelOrder(), _ => SelectedOrder != null);
-
-            BuildReportCommand = new RelayCommand(_ => BuildReport());
-
-            SeedDemo();
-        }
+        #region Core Methods
 
         private void SeedDemo()
         {
@@ -297,8 +317,45 @@ namespace TaroVS.ViewModels
                 StockReserved = true
             });
 
+            SaveAllData();
             UpdateDashboard();
             BuildReport();
+        }
+
+        private void LoadAllData()
+        {
+            Products.Clear();
+            Customers.Clear();
+            Orders.Clear();
+
+            foreach (var p in _dataService.LoadProducts())
+                Products.Add(p);
+
+            foreach (var c in _dataService.LoadCustomers())
+                Customers.Add(c);
+
+            foreach (var o in _dataService.LoadOrders())
+                Orders.Add(o);
+
+            _productId = Products.Any() ? Products.Max(x => x.Id) + 1 : 1;
+            _customerId = Customers.Any() ? Customers.Max(x => x.Id) + 1 : 1;
+            _orderId = Orders.Any() ? Orders.Max(x => x.Id) + 1 : 1;
+
+            UpdateDashboard();
+            BuildReport();
+        }
+
+        private void SaveAllData()
+        {
+            _dataService.SaveProducts(Products.ToList());
+            _dataService.SaveCustomers(Customers.ToList());
+            _dataService.SaveOrders(Orders.ToList());
+        }
+
+        private void AutoSave()
+        {
+            if (_config.AutoSave)
+                SaveAllData();
         }
 
         private void AddProduct()
@@ -331,14 +388,18 @@ namespace TaroVS.ViewModels
             OnPropertyChanged(nameof(NewProductPrice));
             OnPropertyChanged(nameof(NewProductStock));
 
+            AutoSave();
             UpdateDashboard();
         }
 
         private void DeleteProduct()
         {
             if (SelectedProduct == null) return;
+
             Products.Remove(SelectedProduct);
             SelectedProduct = null;
+
+            AutoSave();
             UpdateDashboard();
         }
 
@@ -366,6 +427,7 @@ namespace TaroVS.ViewModels
             OnPropertyChanged(nameof(NewCustomerPhone));
             OnPropertyChanged(nameof(NewCustomerEmail));
 
+            AutoSave();
             UpdateDashboard();
         }
 
@@ -395,7 +457,6 @@ namespace TaroVS.ViewModels
                 return;
             }
 
-         
             SelectedOrderProduct.Stock -= NewOrderQuantity;
 
             var total = SelectedOrderProduct.Price * NewOrderQuantity;
@@ -430,6 +491,7 @@ namespace TaroVS.ViewModels
             OnPropertyChanged(nameof(NewOrderDocumentPath));
             OnPropertyChanged(nameof(SelectedOrderProduct));
 
+            AutoSave();
             UpdateDashboard();
             BuildReport();
         }
@@ -438,17 +500,15 @@ namespace TaroVS.ViewModels
         {
             if (SelectedOrder == null) return;
 
-            var current = SelectedOrder.Status;
-            var next = SelectedNextStatus;
-
-            if (!CanChangeStatus(current, next))
+            if (!CanChangeStatus(SelectedOrder.Status, SelectedNextStatus))
             {
-                MessageBox.Show($"Переход из статуса «{current}» в статус «{next}» недопустим.");
+                MessageBox.Show($"Переход из статуса «{SelectedOrder.Status}» в статус «{SelectedNextStatus}» недопустим.");
                 return;
             }
 
-            SelectedOrder.Status = next;
+            SelectedOrder.Status = SelectedNextStatus;
 
+            AutoSave();
             OnPropertyChanged(nameof(Orders));
             UpdateDashboard();
             BuildReport();
@@ -486,7 +546,6 @@ namespace TaroVS.ViewModels
                 return;
             }
 
-           
             if (SelectedOrder.StockReserved && SelectedOrder.Product != null)
             {
                 SelectedOrder.Product.Stock += SelectedOrder.Quantity;
@@ -495,6 +554,7 @@ namespace TaroVS.ViewModels
             SelectedOrder.Status = "Отмена";
             SelectedOrder.StockReserved = false;
 
+            AutoSave();
             OnPropertyChanged(nameof(Orders));
             UpdateDashboard();
             BuildReport();
@@ -509,6 +569,8 @@ namespace TaroVS.ViewModels
             var lowStock = Products.Count(p => p.Stock <= 2);
 
             DashboardText =
+                $"Система: {_config.SystemName}\n" +
+                $"Режим хранения: {_config.StorageMode}\n\n" +
                 $"Заказы сегодня: {todayOrders}\n" +
                 $"Новые заказы: {newOrders}\n" +
                 $"Активные заказы: {activeOrders}\n" +
@@ -547,6 +609,8 @@ namespace TaroVS.ViewModels
                 $"Выручка: {revenue:N2} руб.\n\n" +
                 $"Топ товаров:\n{topText}";
         }
+
+        #endregion
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string? prop = null)

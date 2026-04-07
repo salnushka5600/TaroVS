@@ -1,0 +1,8 @@
+{
+  "DataFolder": "Data",
+  "BackupFolder": "Backups",
+  "AutoSave": true,
+  "SeedDemoOnFirstRun": true,
+  "SystemName": "Taro Shop MVP",
+  "StorageMode": "JSON"
+}
