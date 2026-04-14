@@ -19,6 +19,7 @@ namespace TaroVS.ViewModels
         public ObservableCollection<Product> Products { get; } = new();
         public ObservableCollection<Customer> Customers { get; } = new();
         public ObservableCollection<Order> Orders { get; } = new();
+        public ObservableCollection<ChangeLogEntry> Changes { get; } = new();
 
         public ObservableCollection<string> OrderStatuses { get; } = new()
         {
@@ -47,6 +48,7 @@ namespace TaroVS.ViewModels
         private int _productId = 1;
         private int _customerId = 1;
         private int _orderId = 1;
+        private int _changeId = 1;
 
         public RelayCommand SeedDemoCommand { get; }
         public RelayCommand SaveDataCommand { get; }
@@ -58,6 +60,7 @@ namespace TaroVS.ViewModels
         public RelayCommand ChangeOrderStatusCommand { get; }
         public RelayCommand CancelOrderCommand { get; }
         public RelayCommand BuildReportCommand { get; }
+        public RelayCommand AddChangeCommand { get; }
 
         public MainViewModel(AppConfig config, JsonDataService dataService)
         {
@@ -76,6 +79,8 @@ namespace TaroVS.ViewModels
 
             ChangeOrderStatusCommand = new RelayCommand(_ => ChangeOrderStatus(), _ => SelectedOrder != null);
             CancelOrderCommand = new RelayCommand(_ => CancelOrder(), _ => SelectedOrder != null);
+            
+            AddChangeCommand = new RelayCommand(_ => AddChange());
 
             BuildReportCommand = new RelayCommand(_ => BuildReport());
 
@@ -85,6 +90,48 @@ namespace TaroVS.ViewModels
             {
                 SeedDemo();
             }
+        }
+       
+        private void AddChange()
+        {
+            if (string.IsNullOrWhiteSpace(NewChangeAuthor))
+            {
+                MessageBox.Show("Введите автора изменения.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(NewChangeVersion))
+            {
+                MessageBox.Show("Введите версию документа.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(NewChangeDescription))
+            {
+                MessageBox.Show("Введите описание изменения.");
+                return;
+            }
+
+            Changes.Insert(0, new ChangeLogEntry
+            {
+                Id = _changeId++,
+                ChangeDate = NewChangeDate,
+                Author = NewChangeAuthor.Trim(),
+                Version = NewChangeVersion.Trim(),
+                Description = NewChangeDescription.Trim()
+            });
+
+            NewChangeDate = DateTime.Today;
+            NewChangeAuthor = "";
+            NewChangeVersion = "";
+            NewChangeDescription = "";
+
+            OnPropertyChanged(nameof(NewChangeDate));
+            OnPropertyChanged(nameof(NewChangeAuthor));
+            OnPropertyChanged(nameof(NewChangeVersion));
+            OnPropertyChanged(nameof(NewChangeDescription));
+
+            AutoSave();
         }
 
         #region Selected Items
@@ -322,6 +369,34 @@ namespace TaroVS.ViewModels
             BuildReport();
         }
 
+        private DateTime _newChangeDate = DateTime.Today;
+        public DateTime NewChangeDate
+        {
+            get => _newChangeDate;
+            set { _newChangeDate = value; OnPropertyChanged(); }
+        }
+
+        private string _newChangeAuthor = "";
+        public string NewChangeAuthor
+        {
+            get => _newChangeAuthor;
+            set { _newChangeAuthor = value; OnPropertyChanged(); }
+        }
+
+        private string _newChangeVersion = "";
+        public string NewChangeVersion
+        {
+            get => _newChangeVersion;
+            set { _newChangeVersion = value; OnPropertyChanged(); }
+        }
+
+        private string _newChangeDescription = "";
+        public string NewChangeDescription
+        {
+            get => _newChangeDescription;
+            set { _newChangeDescription = value; OnPropertyChanged(); }
+        }
+
         private void LoadAllData()
         {
             Products.Clear();
@@ -337,9 +412,13 @@ namespace TaroVS.ViewModels
             foreach (var o in _dataService.LoadOrders())
                 Orders.Add(o);
 
+            foreach (var ch in _dataService.LoadChanges())
+                Changes.Add(ch);
+
             _productId = Products.Any() ? Products.Max(x => x.Id) + 1 : 1;
             _customerId = Customers.Any() ? Customers.Max(x => x.Id) + 1 : 1;
             _orderId = Orders.Any() ? Orders.Max(x => x.Id) + 1 : 1;
+            _changeId = Changes.Any() ? Changes.Max(x => x.Id) + 1 : 1;
 
             UpdateDashboard();
             BuildReport();
@@ -350,6 +429,7 @@ namespace TaroVS.ViewModels
             _dataService.SaveProducts(Products.ToList());
             _dataService.SaveCustomers(Customers.ToList());
             _dataService.SaveOrders(Orders.ToList());
+            _dataService.SaveChanges(Changes.ToList());
         }
 
         private void AutoSave()

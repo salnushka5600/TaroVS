@@ -256,6 +256,43 @@
                             <Button Content="Сформировать" Margin="6" Padding="12,8"
                                     Command="{Binding BuildReportCommand}"/>
                         </WrapPanel>
+                        <TabItem Header="История изменений">
+                            <Grid Margin="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                               
+                                <Border Grid.Row="0" CornerRadius="14" Background="#FAFAFF" Padding="12" Margin="0,0,0,12">
+                                    <WrapPanel>
+                                        <TextBlock Text="Дата:" VerticalAlignment="Center" Margin="6"/>
+                                        <DatePicker SelectedDate="{Binding NewChangeDate}" Margin="6"/>
+
+                                        <TextBlock Text="Автор:" VerticalAlignment="Center" Margin="6"/>
+                                        <TextBox Width="160" Margin="6" Text="{Binding NewChangeAuthor}"/>
+
+                                        <TextBlock Text="Версия:" VerticalAlignment="Center" Margin="6"/>
+                                        <TextBox Width="100" Margin="6" Text="{Binding NewChangeVersion}"/>
+
+                                        <TextBlock Text="Описание:" VerticalAlignment="Center" Margin="6"/>
+                                        <TextBox Width="260" Margin="6" Text="{Binding NewChangeDescription}"/>
+
+                                        <Button Content="Зарегистрировать изменение" Margin="6" Padding="12,8" Command="{Binding AddChangeCommand}"/>
+                                    </WrapPanel>
+                                </Border>
+
+                                <DataGrid Grid.Row="1" ItemsSource="{Binding Changes}" AutoGenerateColumns="False" CanUserAddRows="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
+                                        <DataGridTextColumn Header="Дата" Binding="{Binding ChangeDate}" Width="150"/>
+                                        <DataGridTextColumn Header="Автор" Binding="{Binding Author}" Width="180"/>
+                                        <DataGridTextColumn Header="Версия" Binding="{Binding Version}" Width="100"/>
+                                        <DataGridTextColumn Header="Описание изменения" Binding="{Binding Description}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </TabItem>
 
                         <Border CornerRadius="14" Background="#FAFAFF" Padding="12">
                             <TextBox Text="{Binding ReportText}" IsReadOnly="True"

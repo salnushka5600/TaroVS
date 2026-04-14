@@ -23,6 +23,7 @@ namespace TaroVS.Services
         private string ProductsFile => Path.Combine(_config.DataFolder, "products.json");
         private string CustomersFile => Path.Combine(_config.DataFolder, "customers.json");
         private string OrdersFile => Path.Combine(_config.DataFolder, "orders.json");
+        private string ChangesFile => Path.Combine(_config.DataFolder, "changes.json");
 
         public void SaveProducts(List<Product> products)
         {
@@ -39,6 +40,11 @@ namespace TaroVS.Services
             SaveToFile(OrdersFile, orders);
         }
 
+        public void SaveChanges(List<ChangeLogEntry> changes)
+        {
+            SaveToFile(ChangesFile, changes);
+        }
+
         public List<Product> LoadProducts()
         {
             return LoadFromFile<Product>(ProductsFile);
@@ -52,6 +58,11 @@ namespace TaroVS.Services
         public List<Order> LoadOrders()
         {
             return LoadFromFile<Order>(OrdersFile);
+        }
+
+        public List<ChangeLogEntry> LoadChanges()
+        {
+            return LoadFromFile<ChangeLogEntry>(ChangesFile);
         }
 
         private void SaveToFile<T>(string path, List<T> data)
