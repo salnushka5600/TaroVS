@@ -15,7 +15,7 @@ namespace TaroVS
 
             var dataService = new JsonDataService(config);
 
-            DataContext = new MainViewModel(config, dataService);
+            DataContext = new MainViewModel();
         }
     }
 }

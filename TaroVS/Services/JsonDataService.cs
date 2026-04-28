@@ -15,74 +15,71 @@ namespace TaroVS.Services
 
             if (!Directory.Exists(_config.DataFolder))
                 Directory.CreateDirectory(_config.DataFolder);
-
-            if (!Directory.Exists(_config.BackupFolder))
-                Directory.CreateDirectory(_config.BackupFolder);
         }
 
-        private string ProductsFile => Path.Combine(_config.DataFolder, "products.json");
-        private string CustomersFile => Path.Combine(_config.DataFolder, "customers.json");
-        private string OrdersFile => Path.Combine(_config.DataFolder, "orders.json");
-        private string ChangesFile => Path.Combine(_config.DataFolder, "changes.json");
+        private string ProductsFile =>
+            Path.Combine(_config.DataFolder, "products.json");
 
-        public void SaveProducts(List<Product> products)
-        {
-            SaveToFile(ProductsFile, products);
-        }
+        private string CustomersFile =>
+            Path.Combine(_config.DataFolder, "customers.json");
 
-        public void SaveCustomers(List<Customer> customers)
-        {
-            SaveToFile(CustomersFile, customers);
-        }
+        private string OrdersFile =>
+            Path.Combine(_config.DataFolder, "orders.json");
 
-        public void SaveOrders(List<Order> orders)
-        {
-            SaveToFile(OrdersFile, orders);
-        }
+        private string ChangesFile =>
+            Path.Combine(_config.DataFolder, "changes.json");
 
-        public void SaveChanges(List<ChangeLogEntry> changes)
-        {
-            SaveToFile(ChangesFile, changes);
-        }
 
         public List<Product> LoadProducts()
-        {
-            return LoadFromFile<Product>(ProductsFile);
-        }
+            => Load<Product>(ProductsFile);
 
         public List<Customer> LoadCustomers()
-        {
-            return LoadFromFile<Customer>(CustomersFile);
-        }
+            => Load<Customer>(CustomersFile);
 
         public List<Order> LoadOrders()
-        {
-            return LoadFromFile<Order>(OrdersFile);
-        }
+            => Load<Order>(OrdersFile);
 
         public List<ChangeLogEntry> LoadChanges()
-        {
-            return LoadFromFile<ChangeLogEntry>(ChangesFile);
-        }
+            => Load<ChangeLogEntry>(ChangesFile);
 
-        private void SaveToFile<T>(string path, List<T> data)
-        {
-            var json = JsonSerializer.Serialize(data, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
 
-            File.WriteAllText(path, json);
-        }
 
-        private List<T> LoadFromFile<T>(string path)
+        public void SaveProducts(List<Product> data)
+            => Save(ProductsFile, data);
+
+        public void SaveCustomers(List<Customer> data)
+            => Save(CustomersFile, data);
+
+        public void SaveOrders(List<Order> data)
+            => Save(OrdersFile, data);
+
+        public void SaveChanges(List<ChangeLogEntry> data)
+            => Save(ChangesFile, data);
+
+
+
+        private List<T> Load<T>(string path)
         {
             if (!File.Exists(path))
                 return new List<T>();
 
             var json = File.ReadAllText(path);
-            var result = JsonSerializer.Deserialize<List<T>>(json);
-            return result ?? new List<T>();
+
+            return JsonSerializer.Deserialize<List<T>>(json)
+                   ?? new List<T>();
+        }
+
+        private void Save<T>(string path, List<T> data)
+        {
+            var json =
+                JsonSerializer.Serialize(
+                    data,
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    });
+
+            File.WriteAllText(path, json);
         }
     }
 }

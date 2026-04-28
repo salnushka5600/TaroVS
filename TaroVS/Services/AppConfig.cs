@@ -14,5 +14,6 @@ namespace TaroVS.Services
         public bool SeedDemoOnFirstRun { get; set; } = true;
         public string SystemName { get; set; } = "Taro Shop MVP";
         public string StorageMode { get; set; } = "JSON";
+        public string CurrentUserName { get; set; } = "Менеджер";
     }
 }

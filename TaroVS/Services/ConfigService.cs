@@ -11,15 +11,13 @@ namespace TaroVS.Services
         {
             if (!File.Exists(ConfigFileName))
             {
-                var defaultConfig = new AppConfig();
-                SaveConfig(defaultConfig);
-                return defaultConfig;
+                var config = new AppConfig();
+                SaveConfig(config);
+                return config;
             }
 
             var json = File.ReadAllText(ConfigFileName);
-            var config = JsonSerializer.Deserialize<AppConfig>(json);
-
-            return config ?? new AppConfig();
+            return JsonSerializer.Deserialize<AppConfig>(json) ?? new AppConfig();
         }
 
         public void SaveConfig(AppConfig config)

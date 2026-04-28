@@ -4,5 +4,6 @@
   "AutoSave": true,
   "SeedDemoOnFirstRun": true,
   "SystemName": "Taro Shop MVP",
-  "StorageMode": "JSON"
+  "StorageMode": "JSON",
+  "CurrentUserName": "Менеджер"
 }
