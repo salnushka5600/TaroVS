@@ -11,17 +11,15 @@ namespace TaroVS.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        
+        public User CurrentUser { get; set; }
+
+        public bool IsAdmin => CurrentUser != null && CurrentUser.Role == "Admin";
+        public bool IsClient => CurrentUser != null && CurrentUser.Role == "Client";
 
         public ObservableCollection<Product> Products { get; set; } = new();
-
         public ObservableCollection<Customer> Customers { get; set; } = new();
-
         public ObservableCollection<Order> Orders { get; set; } = new();
-
         public ObservableCollection<CartItem> Cart { get; set; } = new();
-
-        
 
         public ObservableCollection<string> PaymentMethods { get; set; } = new()
         {
@@ -44,8 +42,6 @@ namespace TaroVS.ViewModels
             "Закрыт",
             "Отмена"
         };
-
-        
 
         private Product _selectedProduct;
         public Product SelectedProduct
@@ -80,9 +76,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-       
-
-        private string _newProductName;
+        private string _newProductName = "";
         public string NewProductName
         {
             get => _newProductName;
@@ -93,7 +87,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-        private string _newProductCategory;
+        private string _newProductCategory = "Таро";
         public string NewProductCategory
         {
             get => _newProductCategory;
@@ -104,7 +98,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-        private string _newProductPublisher;
+        private string _newProductPublisher = "";
         public string NewProductPublisher
         {
             get => _newProductPublisher;
@@ -115,7 +109,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-        private decimal _newProductPrice;
+        private decimal _newProductPrice = 2500;
         public decimal NewProductPrice
         {
             get => _newProductPrice;
@@ -126,7 +120,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-        private int _newProductStock;
+        private int _newProductStock = 1;
         public int NewProductStock
         {
             get => _newProductStock;
@@ -137,9 +131,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-        
-
-        private string _clientName;
+        private string _clientName = "";
         public string ClientName
         {
             get => _clientName;
@@ -150,7 +142,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-        private string _clientPhone;
+        private string _clientPhone = "";
         public string ClientPhone
         {
             get => _clientPhone;
@@ -161,7 +153,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-        private string _clientEmail;
+        private string _clientEmail = "";
         public string ClientEmail
         {
             get => _clientEmail;
@@ -172,7 +164,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-        private string _clientComment;
+        private string _clientComment = "";
         public string ClientComment
         {
             get => _clientComment;
@@ -182,8 +174,6 @@ namespace TaroVS.ViewModels
                 Changed();
             }
         }
-
-       
 
         private string _selectedPayment = "Карта";
         public string SelectedPayment
@@ -207,8 +197,6 @@ namespace TaroVS.ViewModels
             }
         }
 
-       
-
         private string _selectedNextStatus = "В сборке";
         public string SelectedNextStatus
         {
@@ -220,9 +208,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-      
-
-        private string _dashboardText;
+        private string _dashboardText = "";
         public string DashboardText
         {
             get => _dashboardText;
@@ -233,9 +219,7 @@ namespace TaroVS.ViewModels
             }
         }
 
-      
-
-        private string _reportText;
+        private string _reportText = "";
         public string ReportText
         {
             get => _reportText;
@@ -246,62 +230,52 @@ namespace TaroVS.ViewModels
             }
         }
 
-       
-
         public RelayCommand SeedDemoCommand { get; set; }
-
         public RelayCommand AddProductCommand { get; set; }
-
         public RelayCommand DeleteProductCommand { get; set; }
-
         public RelayCommand AddToCartCommand { get; set; }
-
         public RelayCommand RemoveFromCartCommand { get; set; }
-
         public RelayCommand CreateClientOrderCommand { get; set; }
-
         public RelayCommand ChangeOrderStatusCommand { get; set; }
-
         public RelayCommand CancelOrderCommand { get; set; }
-
         public RelayCommand BuildReportCommand { get; set; }
-
-     
 
         private int _productId = 1;
         private int _customerId = 1;
         private int _orderId = 1;
 
-        
-
         public MainViewModel()
+            : this(new User
+            {
+                Id = 1,
+                Login = "admin",
+                Password = "admin",
+                Role = "Admin"
+            })
         {
-            SeedDemoCommand =
-                new RelayCommand(_ => SeedDemo());
+        }
 
-            AddProductCommand =
-                new RelayCommand(_ => AddProduct());
+        public MainViewModel(User user)
+        {
+            CurrentUser = user;
 
-            DeleteProductCommand =
-                new RelayCommand(_ => DeleteProduct());
+            SeedDemoCommand = new RelayCommand(_ => SeedDemo());
 
-            AddToCartCommand =
-               new RelayCommand(p => AddToCart(p));
+            AddProductCommand = new RelayCommand(_ => AddProduct());
 
-            RemoveFromCartCommand =
-                new RelayCommand(_ => RemoveFromCart());
+            DeleteProductCommand = new RelayCommand(_ => DeleteProduct());
 
-            CreateClientOrderCommand =
-                new RelayCommand(_ => CreateClientOrder());
+            AddToCartCommand = new RelayCommand(p => AddToCart(p));
 
-            ChangeOrderStatusCommand =
-                new RelayCommand(_ => ChangeOrderStatus());
+            RemoveFromCartCommand = new RelayCommand(_ => RemoveFromCart());
 
-            CancelOrderCommand =
-                new RelayCommand(_ => CancelOrder());
+            CreateClientOrderCommand = new RelayCommand(_ => CreateClientOrder());
 
-            BuildReportCommand =
-                new RelayCommand(_ => BuildReport());
+            ChangeOrderStatusCommand = new RelayCommand(_ => ChangeOrderStatus());
+
+            CancelOrderCommand = new RelayCommand(_ => CancelOrder());
+
+            BuildReportCommand = new RelayCommand(_ => BuildReport());
 
             SeedDemo();
         }
@@ -314,6 +288,10 @@ namespace TaroVS.ViewModels
             Customers.Clear();
             Orders.Clear();
             Cart.Clear();
+
+            _productId = 1;
+            _customerId = 1;
+            _orderId = 1;
 
             Products.Add(new Product
             {
@@ -347,12 +325,22 @@ namespace TaroVS.ViewModels
 
             UpdateDashboard();
             BuildReport();
-        }
 
+            Changed(nameof(Products));
+            Changed(nameof(Customers));
+            Changed(nameof(Orders));
+            Changed(nameof(Cart));
+        }
        
 
         private void AddProduct()
         {
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Добавлять товары может только администратор.");
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(NewProductName))
             {
                 MessageBox.Show("Введите название товара.");
@@ -370,31 +358,46 @@ namespace TaroVS.ViewModels
             });
 
             NewProductName = "";
-            NewProductCategory = "";
+            NewProductCategory = "Таро";
             NewProductPublisher = "";
-            NewProductPrice = 0;
-            NewProductStock = 0;
+            NewProductPrice = 2500;
+            NewProductStock = 1;
 
             Changed(nameof(Products));
+            Changed(nameof(NewProductName));
+            Changed(nameof(NewProductCategory));
+            Changed(nameof(NewProductPublisher));
+            Changed(nameof(NewProductPrice));
+            Changed(nameof(NewProductStock));
 
             UpdateDashboard();
         }
 
         private void DeleteProduct()
         {
-            if (SelectedProduct == null)
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Удалять товары может только администратор.");
                 return;
+            }
+
+            if (SelectedProduct == null)
+            {
+                MessageBox.Show("Выберите товар.");
+                return;
+            }
 
             Products.Remove(SelectedProduct);
 
+            SelectedProduct = null;
+
             Changed(nameof(Products));
+            Changed(nameof(SelectedProduct));
 
             UpdateDashboard();
         }
 
-
-
-        private void AddToCart(object parameter = null)
+        private void AddToCart(object parameter)
         {
             Product product = parameter as Product ?? SelectedProduct;
 
@@ -404,11 +407,23 @@ namespace TaroVS.ViewModels
                 return;
             }
 
+            if (product.Stock <= 0)
+            {
+                MessageBox.Show("Товара нет в наличии.");
+                return;
+            }
+
             var existing = Cart.FirstOrDefault(x =>
                 x.Product.Id == product.Id);
 
             if (existing != null)
             {
+                if (existing.Quantity >= product.Stock)
+                {
+                    MessageBox.Show("Недостаточно товара на складе.");
+                    return;
+                }
+
                 existing.Quantity++;
             }
             else
@@ -426,14 +441,18 @@ namespace TaroVS.ViewModels
         private void RemoveFromCart()
         {
             if (SelectedCartItem == null)
+            {
+                MessageBox.Show("Выберите товар в корзине.");
                 return;
+            }
 
             Cart.Remove(SelectedCartItem);
 
-            Changed(nameof(Cart));
-        }
+            SelectedCartItem = null;
 
-       
+            Changed(nameof(Cart));
+            Changed(nameof(SelectedCartItem));
+        }
 
         private void CreateClientOrder()
         {
@@ -445,7 +464,7 @@ namespace TaroVS.ViewModels
 
             if (string.IsNullOrWhiteSpace(ClientName))
             {
-                MessageBox.Show("Введите имя.");
+                MessageBox.Show("Введите имя клиента.");
                 return;
             }
 
@@ -463,9 +482,7 @@ namespace TaroVS.ViewModels
             {
                 if (item.Product.Stock < item.Quantity)
                 {
-                    MessageBox.Show(
-                        $"Недостаточно товара: {item.Product.Name}");
-
+                    MessageBox.Show($"Недостаточно товара: {item.Product.Name}");
                     return;
                 }
 
@@ -496,21 +513,35 @@ namespace TaroVS.ViewModels
             Changed(nameof(Orders));
             Changed(nameof(Customers));
             Changed(nameof(Cart));
+            Changed(nameof(Products));
+            Changed(nameof(ClientName));
+            Changed(nameof(ClientPhone));
+            Changed(nameof(ClientEmail));
+            Changed(nameof(ClientComment));
 
             UpdateDashboard();
             BuildReport();
 
-            MessageBox.Show("Заказ оформлен.");
+            MessageBox.Show("Заказ успешно оформлен.");
         }
-
-        
 
         private void ChangeOrderStatus()
         {
-            if (SelectedOrder == null)
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Изменять статус заказа может только администратор.");
                 return;
+            }
+
+            if (SelectedOrder == null)
+            {
+                MessageBox.Show("Выберите заказ.");
+                return;
+            }
 
             SelectedOrder.Status = SelectedNextStatus;
+
+            Orders = new ObservableCollection<Order>(Orders);
 
             Changed(nameof(Orders));
 
@@ -520,6 +551,12 @@ namespace TaroVS.ViewModels
 
         private void CancelOrder()
         {
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Отменять заказ может только администратор.");
+                return;
+            }
+
             if (SelectedOrder == null)
             {
                 MessageBox.Show("Выберите заказ.");
@@ -534,8 +571,7 @@ namespace TaroVS.ViewModels
 
             if (SelectedOrder.Product != null)
             {
-                SelectedOrder.Product.Stock +=
-                    SelectedOrder.Quantity;
+                SelectedOrder.Product.Stock += SelectedOrder.Quantity;
             }
 
             SelectedOrder.Status = "Отмена";
@@ -543,6 +579,7 @@ namespace TaroVS.ViewModels
             Orders = new ObservableCollection<Order>(Orders);
 
             Changed(nameof(Orders));
+            Changed(nameof(Products));
 
             UpdateDashboard();
             BuildReport();
@@ -550,47 +587,33 @@ namespace TaroVS.ViewModels
             MessageBox.Show("Заказ отменён.");
         }
 
-        
-
         private void UpdateDashboard()
         {
             DashboardText =
+                $"Пользователь: {CurrentUser.Login}\n" +
+                $"Роль: {CurrentUser.Role}\n" +
                 $"Товаров: {Products.Count}\n" +
                 $"Клиентов: {Customers.Count}\n" +
                 $"Заказов: {Orders.Count}\n" +
-                $"Активных заказов: " +
-                $"{Orders.Count(x => x.Status != "Закрыт")}";
+                $"Активных заказов: {Orders.Count(x => x.Status != "Закрыт" && x.Status != "Отмена")}";
         }
-
-        
 
         private void BuildReport()
         {
-            var completed =
-                Orders.Where(x =>
-                    x.Status == "Закрыт" ||
-                    x.Status == "Отправлен");
+            var completed = Orders.Where(x =>
+                x.Status == "Закрыт" ||
+                x.Status == "Отправлен");
 
             ReportText =
-                $"Количество выполненных заказов: " +
-                $"{completed.Count()}\n\n" +
-
-                $"Общая выручка: " +
-                $"{completed.Sum(x => x.Total)} руб.\n\n" +
-
-                $"Всего клиентов: " +
-                $"{Customers.Count}\n\n" +
-
-                $"Всего товаров: " +
-                $"{Products.Count}";
+                $"Количество выполненных заказов: {completed.Count()}\n\n" +
+                $"Общая выручка: {completed.Sum(x => x.Total)} руб.\n\n" +
+                $"Всего клиентов: {Customers.Count}\n\n" +
+                $"Всего товаров: {Products.Count}";
         }
 
-       
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void Changed(
-            [CallerMemberName] string prop = null)
+        private void Changed([CallerMemberName] string? prop = null)
         {
             PropertyChanged?.Invoke(
                 this,

@@ -105,20 +105,6 @@
                                Margin="0,6,0,0"/>
                 </StackPanel>
 
-                <StackPanel DockPanel.Dock="Right"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center">
-
-                    <RadioButton x:Name="AdminModeButton"
-                                 Content="Админ-панель"
-                                 IsChecked="True"
-                                 Style="{StaticResource SwitchButton}"/>
-
-                    <RadioButton x:Name="ClientModeButton"
-                                 Content="Клиентская часть"
-                                 Style="{StaticResource SwitchButton}"/>
-
-                </StackPanel>
 
             </DockPanel>
 
@@ -130,10 +116,13 @@
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
+
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsChecked, ElementName=AdminModeButton}" Value="True">
+
+                        <DataTrigger Binding="{Binding IsAdmin}" Value="True">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
+
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
@@ -457,10 +446,13 @@
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
+
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsChecked, ElementName=ClientModeButton}" Value="True">
+
+                        <DataTrigger Binding="{Binding IsClient}" Value="True">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
+
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
@@ -517,7 +509,8 @@
 
                                                 <TextBlock Text="{Binding Stock, StringFormat=В наличии: {0} шт.}"  FontSize="13"  Foreground="#6B7280" Margin="0,6,0,12"/>
 
-                                                <Button Content="В корзину"  Height="34"  HorizontalAlignment="Left" Padding="18,6"  Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=TabControl}}" CommandParameter="{Binding}"/>
+                                                <Button Content="В корзину"
+  Height="34"  HorizontalAlignment="Left" Padding="18,6"  Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=TabControl}}" CommandParameter="{Binding}"/>
 
                                             </StackPanel>
 
