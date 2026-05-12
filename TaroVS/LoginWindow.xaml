@@ -12,7 +12,7 @@
 
         <Border Background="White"
                 CornerRadius="24"
-                Padding="24">
+                Padding="40">
 
             <StackPanel>
 
@@ -48,13 +48,6 @@
                         BorderThickness="0"
                         FontWeight="SemiBold"
                         Click="LoginButton_Click"/>
-
-                <TextBlock Text="admin/admin — администратор; client/client — клиент"
-                           TextWrapping="Wrap"
-                           Foreground="#6B7280"
-                           FontSize="12"
-                           Margin="0,16,0,0"
-                           TextAlignment="Center"/>
 
             </StackPanel>
 
