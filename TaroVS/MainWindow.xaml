@@ -43,39 +43,6 @@
             <Setter Property="AutoGenerateColumns" Value="False"/>
         </Style>
 
-        <Style x:Key="SwitchButton" TargetType="RadioButton">
-            <Setter Property="Padding" Value="18,10"/>
-            <Setter Property="Margin" Value="6"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="#4C1D95"/>
-            <Setter Property="Background" Value="#EDE9FE"/>
-            <Setter Property="BorderBrush" Value="#DDD6FE"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-
-            <Style.Triggers>
-                <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Background" Value="#7C3AED"/>
-                    <Setter Property="Foreground" Value="White"/>
-                    <Setter Property="BorderBrush" Value="#7C3AED"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
     </Window.Resources>
 
     <Grid Margin="26">
@@ -93,7 +60,7 @@
 
             <DockPanel>
 
-                <StackPanel DockPanel.Dock="Left">
+                <StackPanel>
                     <TextBlock Text="Taro Shop"
                                FontSize="28"
                                FontWeight="Bold"
@@ -104,7 +71,6 @@
                                FontSize="14"
                                Margin="0,6,0,0"/>
                 </StackPanel>
-
 
             </DockPanel>
 
@@ -124,26 +90,19 @@
                         </DataTrigger>
 
                     </Style.Triggers>
+
                 </Style>
             </Grid.Style>
 
-            <Border Background="White"
-                    CornerRadius="24"
-                    Padding="20">
-
-                <TabControl TabStripPlacement="Left"
-                            Background="Transparent"
-                            BorderThickness="0">
-
+            <Border Background="White" CornerRadius="24" Padding="20">
+                <TabControl TabStripPlacement="Left" Background="Transparent" BorderThickness="0">
                     <TabItem Header="Dashboard">
                         <Grid Margin="24,10,10,10">
-
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-
                             <StackPanel Margin="0,0,0,20">
                                 <TextBlock Text="Админ-панель"
                                            FontSize="26"
@@ -153,6 +112,7 @@
                                 <TextBlock Text="Контроль товаров, заказов и общей информации по магазину"
                                            Foreground="#6B7280"
                                            Margin="0,6,0,0"/>
+
                             </StackPanel>
 
                             <UniformGrid Grid.Row="1"
@@ -165,14 +125,19 @@
                                         Margin="0,0,14,0"
                                         BorderBrush="#EDE9FE"
                                         BorderThickness="1">
+
                                     <StackPanel>
+
                                         <TextBlock Text="Товаров"
                                                    Foreground="#6B7280"/>
+
                                         <TextBlock Text="{Binding Products.Count}"
                                                    FontSize="36"
                                                    FontWeight="Bold"
                                                    Foreground="#2E1065"/>
+
                                     </StackPanel>
+
                                 </Border>
 
                                 <Border Background="#FAFAFF"
@@ -181,14 +146,19 @@
                                         Margin="0,0,14,0"
                                         BorderBrush="#EDE9FE"
                                         BorderThickness="1">
+
                                     <StackPanel>
+
                                         <TextBlock Text="Клиентов"
                                                    Foreground="#6B7280"/>
+
                                         <TextBlock Text="{Binding Customers.Count}"
                                                    FontSize="36"
                                                    FontWeight="Bold"
                                                    Foreground="#2E1065"/>
+
                                     </StackPanel>
+
                                 </Border>
 
                                 <Border Background="#FAFAFF"
@@ -196,14 +166,19 @@
                                         Padding="22"
                                         BorderBrush="#EDE9FE"
                                         BorderThickness="1">
+
                                     <StackPanel>
+
                                         <TextBlock Text="Заказов"
                                                    Foreground="#6B7280"/>
+
                                         <TextBlock Text="{Binding Orders.Count}"
                                                    FontSize="36"
                                                    FontWeight="Bold"
                                                    Foreground="#2E1065"/>
+
                                     </StackPanel>
+
                                 </Border>
 
                             </UniformGrid>
@@ -216,6 +191,7 @@
                                     Padding="18">
 
                                 <Grid>
+
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
@@ -229,448 +205,41 @@
                                     <DataGrid Grid.Row="1"
                                               ItemsSource="{Binding Orders}"
                                               SelectedItem="{Binding SelectedOrder}">
+
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
-                                            <DataGridTextColumn Header="Клиент" Binding="{Binding Customer.FullName}" Width="200"/>
-                                            <DataGridTextColumn Header="Товар" Binding="{Binding Product.Name}" Width="220"/>
-                                            <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="80"/>
-                                            <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="140"/>
-                                            <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="120"/>
+
+                                            <DataGridTextColumn Header="ID"
+                                                                Binding="{Binding Id}"
+                                                                Width="60"/>
+
+                                            <DataGridTextColumn Header="Клиент"
+                                                                Binding="{Binding Customer.FullName}"
+                                                                Width="200"/>
+
+                                            <DataGridTextColumn Header="Товар"
+                                                                Binding="{Binding Product.Name}"
+                                                                Width="220"/>
+
+                                            <DataGridTextColumn Header="Кол-во"
+                                                                Binding="{Binding Quantity}"
+                                                                Width="80"/>
+
+                                            <DataGridTextColumn Header="Статус"
+                                                                Binding="{Binding Status}"
+                                                                Width="140"/>
+
+                                            <DataGridTextColumn Header="Сумма"
+                                                                Binding="{Binding Total}"
+                                                                Width="120"/>
+
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </Grid>
-
                             </Border>
-
                         </Grid>
                     </TabItem>
-
-                    <TabItem Header="Товары">
-
-                        <Grid Margin="10">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-
-                            <Border Grid.Row="0"
-                            Background="#FAFAFF"
-                            CornerRadius="14"
-                            Padding="12"
-                            Margin="0,0,0,12">
-
-                                <WrapPanel>
-
-                                    <TextBox Width="220"
-                         Margin="6"
-                         Text="{Binding NewProductName}"
-                         ToolTip="Название"/>
-
-                                    <TextBox Width="140"
-                         Margin="6"
-                         Text="{Binding NewProductCategory}"
-                         ToolTip="Категория"/>
-
-                                    <TextBox Width="160"
-                         Margin="6"
-                         Text="{Binding NewProductPublisher}"
-                         ToolTip="Издательство"/>
-
-                                    <TextBox Width="100"
-                         Margin="6"
-                         Text="{Binding NewProductPrice}"
-                         ToolTip="Цена"/>
-
-                                    <TextBox Width="80"
-                         Margin="6"
-                         Text="{Binding NewProductStock}"
-                         ToolTip="Остаток"/>
-
-                                    <Button Content="Добавить товар"
-                        Margin="6"
-                        Padding="14,8"
-                        Command="{Binding AddProductCommand}"/>
-
-                                    <Button Content="Удалить"
-                        Margin="6"
-                        Padding="14,8"
-                        Command="{Binding DeleteProductCommand}"/>
-
-                                </WrapPanel>
-
-                            </Border>
-
-                           
-
-                            <DataGrid Grid.Row="1"
-                  ItemsSource="{Binding Products}"
-                  SelectedItem="{Binding SelectedProduct}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False">
-
-                                <DataGrid.Columns>
-
-                                    <DataGridTextColumn Header="ID"
-                                    Binding="{Binding Id}"
-                                    Width="60"/>
-
-                                    <DataGridTextColumn Header="Название"
-                                    Binding="{Binding Name}"
-                                    Width="260"/>
-
-                                    <DataGridTextColumn Header="Категория"
-                                    Binding="{Binding Category}"
-                                    Width="160"/>
-
-                                    <DataGridTextColumn Header="Издательство"
-                                    Binding="{Binding Publisher}"
-                                    Width="180"/>
-
-                                    <DataGridTextColumn Header="Цена"
-                                    Binding="{Binding Price}"
-                                    Width="120"/>
-
-                                    <DataGridTextColumn Header="Остаток"
-                                    Binding="{Binding Stock}"
-                                    Width="120"/>
-
-                                </DataGrid.Columns>
-
-                            </DataGrid>
-
-                        </Grid>
-
-                    </TabItem>
-
-                    <TabItem Header="Заказы">
-                        <Grid Margin="24,10,10,10">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <StackPanel Margin="0,0,0,16">
-                                <TextBlock Text="Заказы клиентов"
-                                           FontSize="24"
-                                           FontWeight="Bold"
-                                           Foreground="#111827"/>
-
-                                <TextBlock Text="Администратор видит заказы, которые клиенты оформили самостоятельно"
-                                           Foreground="#6B7280"
-                                           Margin="0,6,0,0"/>
-                            </StackPanel>
-
-                            <DataGrid Grid.Row="1"
-                                      ItemsSource="{Binding Orders}"
-                                      SelectedItem="{Binding SelectedOrder}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
-                                    <DataGridTextColumn Header="Дата" Binding="{Binding CreatedAt}" Width="150"/>
-                                    <DataGridTextColumn Header="Клиент" Binding="{Binding Customer.FullName}" Width="200"/>
-                                    <DataGridTextColumn Header="Телефон" Binding="{Binding Customer.Phone}" Width="150"/>
-                                    <DataGridTextColumn Header="Товар" Binding="{Binding Product.Name}" Width="220"/>
-                                    <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="80"/>
-                                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="140"/>
-                                    <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="120"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-
-                            <WrapPanel Grid.Row="2"
-                                       HorizontalAlignment="Right"
-                                       Margin="0,16,0,0">
-
-                             
-                                <Button Content="Изменить статус"
-                                        Command="{Binding ChangeOrderStatusCommand}"/>
-
-                                <Button Content="Отменить заказ"
-                                        Background="#FEE2E2"
-                                        Foreground="#991B1B"
-                                        BorderBrush="#FCA5A5"
-                                        Command="{Binding CancelOrderCommand}"/>
-
-                            </WrapPanel>
-
-                        </Grid>
-                    </TabItem>
-
-                    <TabItem Header="Отчёты">
-                        <StackPanel Margin="24">
-
-                            <TextBlock Text="Отчёты"
-                                       FontSize="24"
-                                       FontWeight="Bold"
-                                       Foreground="#111827"/>
-
-                            <TextBlock Text="Формирование простой аналитики по заказам"
-                                       Foreground="#6B7280"
-                                       Margin="0,6,0,18"/>
-
-                            <Button Content="Сформировать отчёт"
-                                    Width="200"
-                                    HorizontalAlignment="Left"
-                                    Command="{Binding BuildReportCommand}"/>
-
-                            <Border Background="#FAFAFF"
-                                    CornerRadius="18"
-                                    Padding="18"
-                                    BorderBrush="#EDE9FE"
-                                    BorderThickness="1"
-                                    Margin="0,18,0,0">
-
-                                <TextBox Text="{Binding ReportText}"
-                                         Height="300"
-                                         Background="Transparent"
-                                         BorderThickness="0"
-                                         TextWrapping="Wrap"
-                                         IsReadOnly="True"/>
-
-                            </Border>
-
-                        </StackPanel>
-                    </TabItem>
-
                 </TabControl>
-
             </Border>
-
         </Grid>
-
-        <Grid Grid.Row="1"
-              x:Name="ClientPanel">
-
-            <Grid.Style>
-                <Style TargetType="Grid">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-
-                    <Style.Triggers>
-
-                        <DataTrigger Binding="{Binding IsClient}" Value="True">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-
-            <Border Background="White"
-                    CornerRadius="24"
-                    Padding="20">
-
-                <TabControl Background="Transparent"
-                            BorderThickness="0">
-
-                    <TabItem Header="Каталог">
-
-                        <Grid Margin="18">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-
-                            <StackPanel Grid.Row="0"  Margin="0,0,0,20">
-
-                                <TextBlock Text="Каталог" FontSize="24" FontWeight="Bold" Foreground="#111827"/>
-
-                                <TextBlock Text="Просмотр товаров и добавление в корзину" FontSize="13" Foreground="#6B7280" Margin="0,6,0,0"/>
-
-                            </StackPanel>
-
-
-
-                            <ItemsControl Grid.Row="1"  ItemsSource="{Binding Products}">
-
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-
-                                        <Border Width="220"
-                            Height="260" Background="#FAFAFF"  CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="1"  Padding="14" Margin="0,0,24,20">
-
-                                            <StackPanel>
-
-                                                <Border Height="110" Background="#EDE9FE" CornerRadius="12" Margin="0,0,0,14"/>
-
-                                                <TextBlock Text="{Binding Name}" FontSize="14"  FontWeight="Bold"  Foreground="#111827" TextTrimming="CharacterEllipsis"/>
-
-                                                <TextBlock Text="{Binding Price, StringFormat={}{0} руб.}" FontSize="13"  Foreground="#6B7280" Margin="0,6,0,0"/>
-
-                                                <TextBlock Text="{Binding Stock, StringFormat=В наличии: {0} шт.}"  FontSize="13"  Foreground="#6B7280" Margin="0,6,0,12"/>
-
-                                                <Button Content="В корзину"
-  Height="34"  HorizontalAlignment="Left" Padding="18,6"  Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=TabControl}}" CommandParameter="{Binding}"/>
-
-                                            </StackPanel>
-
-                                        </Border>
-
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-
-                            </ItemsControl>
-
-                        </Grid>
-
-                    </TabItem>
-
-                    <TabItem Header="Корзина">
-                        <Grid Margin="20">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <StackPanel Margin="0,0,0,20">
-                                <TextBlock Text="Корзина"
-                                           FontSize="28"
-                                           FontWeight="Bold"
-                                           Foreground="#2E1065"/>
-
-                                <TextBlock Text="Проверьте выбранные товары перед оформлением заказа"
-                                           Foreground="#6B7280"
-                                           Margin="0,6,0,0"/>
-                            </StackPanel>
-
-                            <DataGrid Grid.Row="1"
-                                      ItemsSource="{Binding Cart}"
-                                      SelectedItem="{Binding SelectedCartItem}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Товар" Binding="{Binding Product.Name}" Width="260"/>
-                                    <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="120"/>
-                                    <DataGridTextColumn Header="Цена" Binding="{Binding Product.Price}" Width="120"/>
-                                    <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="120"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-
-                            <WrapPanel Grid.Row="2"
-                                       HorizontalAlignment="Right"
-                                       Margin="0,18,0,0">
-
-                                <Button Content="Удалить из корзины"
-                                        Background="#FEE2E2"
-                                        Foreground="#991B1B"
-                                        BorderBrush="#FCA5A5"
-                                        Command="{Binding RemoveFromCartCommand}"/>
-
-                            </WrapPanel>
-
-                        </Grid>
-                    </TabItem>
-
-                    <TabItem Header="Оформление заказа">
-                        <Grid Margin="20">
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="420"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Border Grid.Column="0"
-                                    Background="#FAFAFF"
-                                    CornerRadius="20"
-                                    Padding="24"
-                                    BorderBrush="#EDE9FE"
-                                    BorderThickness="1">
-
-                                <StackPanel>
-
-                                    <TextBlock Text="Данные покупателя"
-                                               FontSize="24"
-                                               FontWeight="Bold"
-                                               Foreground="#2E1065"
-                                               Margin="0,0,0,18"/>
-
-                                    <TextBlock Text="ФИО"/>
-                                    <TextBox Text="{Binding ClientName}"/>
-
-                                    <TextBlock Text="Телефон"/>
-                                    <TextBox Text="{Binding ClientPhone}"/>
-
-                                    <TextBlock Text="Email"/>
-                                    <TextBox Text="{Binding ClientEmail}"/>
-
-                                    <TextBlock Text="Доставка"/>
-                                    <ComboBox ItemsSource="{Binding DeliveryMethods}"
-                                              SelectedItem="{Binding SelectedDelivery}"/>
-
-                                    <TextBlock Text="Оплата"/>
-                                    <ComboBox ItemsSource="{Binding PaymentMethods}"
-                                              SelectedItem="{Binding SelectedPayment}"/>
-
-                                    <TextBlock Text="Комментарий"/>
-                                    <TextBox Text="{Binding ClientComment}"
-                                             Height="80"
-                                             TextWrapping="Wrap"/>
-
-                                    <Button Content="Оформить заказ"
-                                            Margin="6,18,6,6"
-                                            Command="{Binding CreateClientOrderCommand}"/>
-
-                                </StackPanel>
-
-                            </Border>
-
-                            <Border Grid.Column="1"
-                                    Background="White"
-                                    CornerRadius="20"
-                                    Padding="24"
-                                    Margin="20,0,0,0"
-                                    BorderBrush="#EDE9FE"
-                                    BorderThickness="1">
-
-                                <StackPanel>
-
-                                    <TextBlock Text="Как работает оформление"
-                                               FontSize="24"
-                                               FontWeight="Bold"
-                                               Foreground="#111827"/>
-
-                                    <TextBlock Text="1. Клиент выбирает товар в каталоге."
-                                               Margin="0,18,0,0"
-                                               Foreground="#4B5563"/>
-
-                                    <TextBlock Text="2. Добавляет товар в корзину."
-                                               Margin="0,10,0,0"
-                                               Foreground="#4B5563"/>
-
-                                    <TextBlock Text="3. Заполняет свои контактные данные."
-                                               Margin="0,10,0,0"
-                                               Foreground="#4B5563"/>
-
-                                    <TextBlock Text="4. Нажимает кнопку «Оформить заказ»."
-                                               Margin="0,10,0,0"
-                                               Foreground="#4B5563"/>
-
-                                    <TextBlock Text="5. Заказ автоматически появляется в админ-панели со статусом «Новый»."
-                                               Margin="0,10,0,0"
-                                               Foreground="#4B5563"/>
-
-                                </StackPanel>
-
-                            </Border>
-
-                        </Grid>
-                    </TabItem>
-
-                </TabControl>
-
-            </Border>
-
-        </Grid>
-
     </Grid>
 </Window>

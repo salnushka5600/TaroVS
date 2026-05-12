@@ -9,17 +9,22 @@ namespace TaroVS
         {
             base.OnStartup(e);
 
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             var loginWindow = new LoginWindow();
+            var result = loginWindow.ShowDialog();
 
-            if (loginWindow.ShowDialog() == true &&
-                loginWindow.CurrentUser != null)
+            if (result == true && loginWindow.CurrentUser != null)
             {
-                var mainWindow = new MainWindow();
-
-                mainWindow.DataContext =
-                    new MainViewModel(loginWindow.CurrentUser);
+                var mainWindow = new MainWindow
+                {
+                    DataContext = new MainViewModel(loginWindow.CurrentUser)
+                };
 
                 MainWindow = mainWindow;
+
+                ShutdownMode = ShutdownMode.OnMainWindowClose;
+
                 mainWindow.Show();
             }
             else

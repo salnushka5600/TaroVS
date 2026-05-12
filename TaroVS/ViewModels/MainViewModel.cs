@@ -6,11 +6,15 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using TaroVS.Commands;
 using TaroVS.Models;
+using TaroVS.Services;
 
 namespace TaroVS.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        private readonly OrderStorageService _orderStorage =
+            new OrderStorageService();
+
         public User CurrentUser { get; set; }
 
         public bool IsAdmin => CurrentUser != null && CurrentUser.Role == "Admin";
@@ -260,33 +264,23 @@ namespace TaroVS.ViewModels
             CurrentUser = user;
 
             SeedDemoCommand = new RelayCommand(_ => SeedDemo());
-
             AddProductCommand = new RelayCommand(_ => AddProduct());
-
             DeleteProductCommand = new RelayCommand(_ => DeleteProduct());
-
             AddToCartCommand = new RelayCommand(p => AddToCart(p));
-
             RemoveFromCartCommand = new RelayCommand(_ => RemoveFromCart());
-
             CreateClientOrderCommand = new RelayCommand(_ => CreateClientOrder());
-
             ChangeOrderStatusCommand = new RelayCommand(_ => ChangeOrderStatus());
-
             CancelOrderCommand = new RelayCommand(_ => CancelOrder());
-
             BuildReportCommand = new RelayCommand(_ => BuildReport());
 
             SeedDemo();
+            LoadSavedOrders();
         }
-
-       
 
         private void SeedDemo()
         {
             Products.Clear();
             Customers.Clear();
-            Orders.Clear();
             Cart.Clear();
 
             _productId = 1;
@@ -323,15 +317,49 @@ namespace TaroVS.ViewModels
                 Stock = 5
             });
 
-            UpdateDashboard();
-            BuildReport();
-
             Changed(nameof(Products));
             Changed(nameof(Customers));
-            Changed(nameof(Orders));
             Changed(nameof(Cart));
+
+            UpdateDashboard();
+            BuildReport();
         }
-       
+
+        private void LoadSavedOrders()
+        {
+            Orders.Clear();
+            Customers.Clear();
+
+            var savedOrders = _orderStorage.LoadOrders();
+
+            foreach (var order in savedOrders)
+            {
+                Orders.Add(order);
+
+                if (order.Customer != null &&
+                    !Customers.Any(c => c.Id == order.Customer.Id))
+                {
+                    Customers.Add(order.Customer);
+                }
+            }
+
+            if (Orders.Any())
+                _orderId = Orders.Max(o => o.Id) + 1;
+
+            if (Customers.Any())
+                _customerId = Customers.Max(c => c.Id) + 1;
+
+            Changed(nameof(Orders));
+            Changed(nameof(Customers));
+
+            UpdateDashboard();
+            BuildReport();
+        }
+
+        private void SaveOrders()
+        {
+            _orderStorage.SaveOrders(Orders);
+        }
 
         private void AddProduct()
         {
@@ -388,7 +416,6 @@ namespace TaroVS.ViewModels
             }
 
             Products.Remove(SelectedProduct);
-
             SelectedProduct = null;
 
             Changed(nameof(Products));
@@ -425,6 +452,7 @@ namespace TaroVS.ViewModels
                 }
 
                 existing.Quantity++;
+                Changed(nameof(Cart));
             }
             else
             {
@@ -447,7 +475,6 @@ namespace TaroVS.ViewModels
             }
 
             Cart.Remove(SelectedCartItem);
-
             SelectedCartItem = null;
 
             Changed(nameof(Cart));
@@ -503,6 +530,8 @@ namespace TaroVS.ViewModels
                 });
             }
 
+            SaveOrders();
+
             Cart.Clear();
 
             ClientName = "";
@@ -522,7 +551,7 @@ namespace TaroVS.ViewModels
             UpdateDashboard();
             BuildReport();
 
-            MessageBox.Show("Заказ успешно оформлен.");
+            MessageBox.Show("Заказ успешно оформлен. Он отправлен администратору.");
         }
 
         private void ChangeOrderStatus()
@@ -542,6 +571,8 @@ namespace TaroVS.ViewModels
             SelectedOrder.Status = SelectedNextStatus;
 
             Orders = new ObservableCollection<Order>(Orders);
+
+            SaveOrders();
 
             Changed(nameof(Orders));
 
@@ -578,6 +609,8 @@ namespace TaroVS.ViewModels
 
             Orders = new ObservableCollection<Order>(Orders);
 
+            SaveOrders();
+
             Changed(nameof(Orders));
             Changed(nameof(Products));
 
@@ -600,15 +633,57 @@ namespace TaroVS.ViewModels
 
         private void BuildReport()
         {
-            var completed = Orders.Where(x =>
+            var notCanceledOrders = Orders.Where(x =>
+                x.Status != "Отмена");
+
+            var completedOrders = Orders.Where(x =>
                 x.Status == "Закрыт" ||
                 x.Status == "Отправлен");
 
+            int totalOrders = Orders.Count;
+            int newOrders = Orders.Count(x => x.Status == "Новый");
+            int activeOrders = Orders.Count(x => x.Status == "Новый" || x.Status == "В сборке");
+            int sentOrders = Orders.Count(x => x.Status == "Отправлен");
+            int closedOrders = Orders.Count(x => x.Status == "Закрыт");
+            int canceledOrders = Orders.Count(x => x.Status == "Отмена");
+
+            decimal totalOrderSum = notCanceledOrders.Sum(x => x.Total);
+            decimal completedRevenue = completedOrders.Sum(x => x.Total);
+
+            int totalProductsSold = notCanceledOrders.Sum(x => x.Quantity);
+
+            string topProduct = "нет данных";
+
+            if (notCanceledOrders.Any())
+            {
+                topProduct = notCanceledOrders
+                    .GroupBy(x => x.Product?.Name ?? "Без названия")
+                    .Select(g => new
+                    {
+                        Name = g.Key,
+                        Count = g.Sum(x => x.Quantity)
+                    })
+                    .OrderByDescending(x => x.Count)
+                    .First()
+                    .Name;
+            }
+
             ReportText =
-                $"Количество выполненных заказов: {completed.Count()}\n\n" +
-                $"Общая выручка: {completed.Sum(x => x.Total)} руб.\n\n" +
-                $"Всего клиентов: {Customers.Count}\n\n" +
-                $"Всего товаров: {Products.Count}";
+                "ОТЧЁТ ПО МАГАЗИНУ TARO SHOP\n\n" +
+                $"Всего заказов: {totalOrders}\n" +
+                $"Новые заказы: {newOrders}\n" +
+                $"Активные заказы: {activeOrders}\n" +
+                $"Отправленные заказы: {sentOrders}\n" +
+                $"Закрытые заказы: {closedOrders}\n" +
+                $"Отменённые заказы: {canceledOrders}\n\n" +
+                $"Клиентов в базе: {Customers.Count}\n" +
+                $"Товаров в каталоге: {Products.Count}\n" +
+                $"Товаров в заказах: {totalProductsSold}\n\n" +
+                $"Сумма всех неотменённых заказов: {totalOrderSum} руб.\n" +
+                $"Выручка по завершённым заказам: {completedRevenue} руб.\n" +
+                $"Самый популярный товар: {topProduct}";
+
+            Changed(nameof(ReportText));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

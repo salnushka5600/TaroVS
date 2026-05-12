@@ -17,10 +17,10 @@ namespace TaroVS
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            var login = LoginBox.Text;
-            var password = PasswordBox.Password;
+            string login = LoginBox.Text.Trim();
+            string password = PasswordBox.Password.Trim();
 
-            var user = _authService.Login(login, password);
+            User? user = _authService.Login(login, password);
 
             if (user == null)
             {
@@ -30,7 +30,6 @@ namespace TaroVS
 
             CurrentUser = user;
             DialogResult = true;
-            Close();
         }
     }
 }
