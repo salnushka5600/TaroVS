@@ -14,11 +14,12 @@ namespace TaroVS
             if (loginWindow.ShowDialog() == true &&
                 loginWindow.CurrentUser != null)
             {
-                var mainWindow = new MainWindow
-                {
-                    DataContext = new MainViewModel(loginWindow.CurrentUser)
-                };
+                var mainWindow = new MainWindow();
 
+                mainWindow.DataContext =
+                    new MainViewModel(loginWindow.CurrentUser);
+
+                MainWindow = mainWindow;
                 mainWindow.Show();
             }
             else
