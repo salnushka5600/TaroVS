@@ -12,17 +12,15 @@ namespace TaroVS.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private readonly OrderStorageService _orderStorage =
-            new OrderStorageService();
-
-        private readonly NotificationStorageService _notificationStorage =
-            new NotificationStorageService();
+        private readonly OrderStorageService _orderStorage = new OrderStorageService();
+        private readonly NotificationStorageService _notificationStorage = new NotificationStorageService();
+        private readonly ReliabilityStorageService _reliabilityStorage = new ReliabilityStorageService();
 
         public User CurrentUser { get; set; }
 
         public bool IsAdmin =>
-        CurrentUser != null &&
-        CurrentUser.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+            CurrentUser != null &&
+            CurrentUser.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase);
 
         public bool IsClient =>
             CurrentUser != null &&
@@ -33,6 +31,7 @@ namespace TaroVS.ViewModels
         public ObservableCollection<Order> Orders { get; set; } = new();
         public ObservableCollection<CartItem> Cart { get; set; } = new();
         public ObservableCollection<Notification> Notifications { get; set; } = new();
+        public ObservableCollection<SystemFailure> Failures { get; set; } = new();
 
         public ObservableCollection<string> PaymentMethods { get; set; } = new()
         {
@@ -243,6 +242,17 @@ namespace TaroVS.ViewModels
             }
         }
 
+        private string _reliabilityText = "";
+        public string ReliabilityText
+        {
+            get => _reliabilityText;
+            set
+            {
+                _reliabilityText = value;
+                Changed();
+            }
+        }
+
         public RelayCommand SeedDemoCommand { get; set; }
         public RelayCommand AddProductCommand { get; set; }
         public RelayCommand DeleteProductCommand { get; set; }
@@ -252,11 +262,16 @@ namespace TaroVS.ViewModels
         public RelayCommand ChangeOrderStatusCommand { get; set; }
         public RelayCommand CancelOrderCommand { get; set; }
         public RelayCommand BuildReportCommand { get; set; }
+        public RelayCommand RegisterFailureCommand { get; set; }
+        public RelayCommand BuildReliabilityReportCommand { get; set; }
 
         private int _productId = 1;
         private int _customerId = 1;
         private int _orderId = 1;
         private int _notificationId = 1;
+        private int _failureId = 1;
+
+        private readonly DateTime _appStartTime = DateTime.Now;
 
         public MainViewModel()
             : this(new User
@@ -282,10 +297,14 @@ namespace TaroVS.ViewModels
             ChangeOrderStatusCommand = new RelayCommand(_ => ChangeOrderStatus());
             CancelOrderCommand = new RelayCommand(_ => CancelOrder());
             BuildReportCommand = new RelayCommand(_ => BuildReport());
+            RegisterFailureCommand = new RelayCommand(_ => RegisterFailure());
+            BuildReliabilityReportCommand = new RelayCommand(_ => BuildReliabilityReport());
 
             SeedDemo();
             LoadSavedOrders();
             LoadNotifications();
+            LoadFailures();
+            BuildReliabilityReport();
         }
 
         private void SeedDemo()
@@ -372,8 +391,7 @@ namespace TaroVS.ViewModels
         {
             Notifications.Clear();
 
-            var savedNotifications =
-                _notificationStorage.LoadNotifications();
+            var savedNotifications = _notificationStorage.LoadNotifications();
 
             foreach (var notification in savedNotifications)
             {
@@ -386,10 +404,7 @@ namespace TaroVS.ViewModels
             Changed(nameof(Notifications));
         }
 
-        private void SendNotification(
-            string title,
-            string message,
-            string type)
+        private void SendNotification(string title, string message, string type)
         {
             Notifications.Insert(0, new Notification
             {
@@ -403,6 +418,72 @@ namespace TaroVS.ViewModels
             _notificationStorage.SaveNotifications(Notifications);
 
             Changed(nameof(Notifications));
+        }
+
+        private void LoadFailures()
+        {
+            Failures.Clear();
+
+            var savedFailures = _reliabilityStorage.LoadFailures();
+
+            foreach (var failure in savedFailures)
+            {
+                Failures.Add(failure);
+            }
+
+            if (Failures.Any())
+                _failureId = Failures.Max(f => f.Id) + 1;
+
+            Changed(nameof(Failures));
+        }
+
+        private void SaveFailures()
+        {
+            _reliabilityStorage.SaveFailures(Failures);
+        }
+
+        private void RegisterFailure()
+        {
+            Failures.Insert(0, new SystemFailure
+            {
+                Id = _failureId++,
+                CreatedAt = DateTime.Now,
+                Module = "Система",
+                Description = "Зафиксирован отказ или ошибка в работе приложения",
+                Criticality = "Средняя"
+            });
+
+            SaveFailures();
+            BuildReliabilityReport();
+
+            Changed(nameof(Failures));
+
+            MessageBox.Show("Отказ зарегистрирован.");
+        }
+
+        private void BuildReliabilityReport()
+        {
+            double totalHours = (DateTime.Now - _appStartTime).TotalHours;
+
+            if (totalHours < 0.01)
+                totalHours = 0.01;
+
+            int failureCount = Failures.Count;
+
+            double lambda = failureCount / totalHours;
+
+            double mtbf = failureCount == 0
+                ? totalHours
+                : totalHours / failureCount;
+
+            double mttf = mtbf;
+
+            ReliabilityText =
+                "ОТЧЁТ ПО НАДЁЖНОСТИ TARO SHOP\n\n" +
+                $"Время работы приложения: {totalHours:F2} ч.\n" +
+                $"Количество зарегистрированных отказов: {failureCount}\n\n" +
+                $"Интенсивность отказов: {lambda:F4} отказа/час\n";
+            Changed(nameof(ReliabilityText));
         }
 
         private void AddProduct()

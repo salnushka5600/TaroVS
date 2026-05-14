@@ -447,6 +447,89 @@
 
                         </Grid>
                     </TabItem>
+                    <TabItem Header="Надёжность">
+                        <Grid Margin="24,10,10,10">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="Показатели надёжности"
+                                  FontSize="24"
+                                  FontWeight="Bold"
+                                  Foreground="#111827"/>
+                            </StackPanel>
+
+                            <WrapPanel Grid.Row="1"
+                              Margin="0,0,0,16">
+
+                                <Button Content="Зарегистрировать отказ"
+                                   Command="{Binding RegisterFailureCommand}"/>
+
+                                <Button Content="Сформировать отчёт"
+                                   Command="{Binding BuildReliabilityReportCommand}"/>
+
+                            </WrapPanel>
+
+                            <Grid Grid.Row="2">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="420"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0"
+                                   Background="#FAFAFF"
+                                   CornerRadius="18"
+                                   Padding="18"
+                                   BorderBrush="#EDE9FE"
+                                   BorderThickness="1"
+                                   Margin="0,0,16,0">
+
+                                    <TextBox Text="{Binding ReliabilityText}"
+                                       Background="Transparent"
+                                       BorderThickness="0"
+                                       TextWrapping="Wrap"
+                                       IsReadOnly="True"/>
+
+                                </Border>
+
+                                <DataGrid Grid.Column="1"
+                                     ItemsSource="{Binding Failures}"
+                                     AutoGenerateColumns="False"
+                                     CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID"
+                                        Binding="{Binding Id}"
+                                        Width="50"/>
+
+                                        <DataGridTextColumn Header="Дата"
+                                        Binding="{Binding CreatedAt}"
+                                        Width="150"/>
+
+                                        <DataGridTextColumn Header="Модуль"
+                                        Binding="{Binding Module}"
+                                        Width="120"/>
+
+                                        <DataGridTextColumn Header="Описание"
+                                        Binding="{Binding Description}"
+                                        Width="*"/>
+
+                                        <DataGridTextColumn Header="Критичность"
+                                        Binding="{Binding Criticality}"
+                                        Width="120"/>
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+
+                            </Grid>
+
+                        </Grid>
+                    </TabItem>
 
                     <TabItem Header="Отчёты">
                         <StackPanel Margin="24">
