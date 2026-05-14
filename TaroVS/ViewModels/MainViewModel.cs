@@ -15,15 +15,24 @@ namespace TaroVS.ViewModels
         private readonly OrderStorageService _orderStorage =
             new OrderStorageService();
 
+        private readonly NotificationStorageService _notificationStorage =
+            new NotificationStorageService();
+
         public User CurrentUser { get; set; }
 
-        public bool IsAdmin => CurrentUser != null && CurrentUser.Role == "Admin";
-        public bool IsClient => CurrentUser != null && CurrentUser.Role == "Client";
+        public bool IsAdmin =>
+        CurrentUser != null &&
+        CurrentUser.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+
+        public bool IsClient =>
+            CurrentUser != null &&
+            CurrentUser.Role.Equals("Client", StringComparison.OrdinalIgnoreCase);
 
         public ObservableCollection<Product> Products { get; set; } = new();
         public ObservableCollection<Customer> Customers { get; set; } = new();
         public ObservableCollection<Order> Orders { get; set; } = new();
         public ObservableCollection<CartItem> Cart { get; set; } = new();
+        public ObservableCollection<Notification> Notifications { get; set; } = new();
 
         public ObservableCollection<string> PaymentMethods { get; set; } = new()
         {
@@ -47,8 +56,8 @@ namespace TaroVS.ViewModels
             "Отмена"
         };
 
-        private Product _selectedProduct;
-        public Product SelectedProduct
+        private Product? _selectedProduct;
+        public Product? SelectedProduct
         {
             get => _selectedProduct;
             set
@@ -58,8 +67,8 @@ namespace TaroVS.ViewModels
             }
         }
 
-        private Order _selectedOrder;
-        public Order SelectedOrder
+        private Order? _selectedOrder;
+        public Order? SelectedOrder
         {
             get => _selectedOrder;
             set
@@ -69,8 +78,8 @@ namespace TaroVS.ViewModels
             }
         }
 
-        private CartItem _selectedCartItem;
-        public CartItem SelectedCartItem
+        private CartItem? _selectedCartItem;
+        public CartItem? SelectedCartItem
         {
             get => _selectedCartItem;
             set
@@ -247,6 +256,7 @@ namespace TaroVS.ViewModels
         private int _productId = 1;
         private int _customerId = 1;
         private int _orderId = 1;
+        private int _notificationId = 1;
 
         public MainViewModel()
             : this(new User
@@ -275,6 +285,7 @@ namespace TaroVS.ViewModels
 
             SeedDemo();
             LoadSavedOrders();
+            LoadNotifications();
         }
 
         private void SeedDemo()
@@ -284,8 +295,6 @@ namespace TaroVS.ViewModels
             Cart.Clear();
 
             _productId = 1;
-            _customerId = 1;
-            _orderId = 1;
 
             Products.Add(new Product
             {
@@ -322,7 +331,6 @@ namespace TaroVS.ViewModels
             Changed(nameof(Cart));
 
             UpdateDashboard();
-            BuildReport();
         }
 
         private void LoadSavedOrders()
@@ -353,12 +361,48 @@ namespace TaroVS.ViewModels
             Changed(nameof(Customers));
 
             UpdateDashboard();
-            BuildReport();
         }
 
         private void SaveOrders()
         {
             _orderStorage.SaveOrders(Orders);
+        }
+
+        private void LoadNotifications()
+        {
+            Notifications.Clear();
+
+            var savedNotifications =
+                _notificationStorage.LoadNotifications();
+
+            foreach (var notification in savedNotifications)
+            {
+                Notifications.Add(notification);
+            }
+
+            if (Notifications.Any())
+                _notificationId = Notifications.Max(n => n.Id) + 1;
+
+            Changed(nameof(Notifications));
+        }
+
+        private void SendNotification(
+            string title,
+            string message,
+            string type)
+        {
+            Notifications.Insert(0, new Notification
+            {
+                Id = _notificationId++,
+                CreatedAt = DateTime.Now,
+                Title = title,
+                Message = message,
+                Type = type
+            });
+
+            _notificationStorage.SaveNotifications(Notifications);
+
+            Changed(nameof(Notifications));
         }
 
         private void AddProduct()
@@ -375,6 +419,8 @@ namespace TaroVS.ViewModels
                 return;
             }
 
+            string productName = NewProductName;
+
             Products.Add(new Product
             {
                 Id = _productId++,
@@ -384,6 +430,12 @@ namespace TaroVS.ViewModels
                 Price = NewProductPrice,
                 Stock = NewProductStock
             });
+
+            SendNotification(
+                "Добавлен товар",
+                $"Администратор добавил товар: {productName}.",
+                "Товар"
+            );
 
             NewProductName = "";
             NewProductCategory = "Таро";
@@ -415,8 +467,16 @@ namespace TaroVS.ViewModels
                 return;
             }
 
+            string productName = SelectedProduct.Name;
+
             Products.Remove(SelectedProduct);
             SelectedProduct = null;
+
+            SendNotification(
+                "Удалён товар",
+                $"Администратор удалил товар: {productName}.",
+                "Товар"
+            );
 
             Changed(nameof(Products));
             Changed(nameof(SelectedProduct));
@@ -424,9 +484,9 @@ namespace TaroVS.ViewModels
             UpdateDashboard();
         }
 
-        private void AddToCart(object parameter)
+        private void AddToCart(object? parameter)
         {
-            Product product = parameter as Product ?? SelectedProduct;
+            Product? product = parameter as Product ?? SelectedProduct;
 
             if (product == null)
             {
@@ -452,7 +512,6 @@ namespace TaroVS.ViewModels
                 }
 
                 existing.Quantity++;
-                Changed(nameof(Cart));
             }
             else
             {
@@ -505,6 +564,8 @@ namespace TaroVS.ViewModels
 
             Customers.Add(customer);
 
+            decimal orderSum = Cart.Sum(x => x.Total);
+
             foreach (var item in Cart)
             {
                 if (item.Product.Stock < item.Quantity)
@@ -532,6 +593,12 @@ namespace TaroVS.ViewModels
 
             SaveOrders();
 
+            SendNotification(
+                "Новый заказ",
+                $"Клиент {customer.FullName} оформил заказ. Сумма заказа: {orderSum} руб.",
+                "Заказ"
+            );
+
             Cart.Clear();
 
             ClientName = "";
@@ -549,7 +616,6 @@ namespace TaroVS.ViewModels
             Changed(nameof(ClientComment));
 
             UpdateDashboard();
-            BuildReport();
 
             MessageBox.Show("Заказ успешно оформлен. Он отправлен администратору.");
         }
@@ -574,10 +640,15 @@ namespace TaroVS.ViewModels
 
             SaveOrders();
 
+            SendNotification(
+                "Изменён статус заказа",
+                $"Заказ №{SelectedOrder.Id} получил статус: {SelectedNextStatus}.",
+                "Заказ"
+            );
+
             Changed(nameof(Orders));
 
             UpdateDashboard();
-            BuildReport();
         }
 
         private void CancelOrder()
@@ -611,11 +682,16 @@ namespace TaroVS.ViewModels
 
             SaveOrders();
 
+            SendNotification(
+                "Заказ отменён",
+                $"Администратор отменил заказ №{SelectedOrder.Id}.",
+                "Заказ"
+            );
+
             Changed(nameof(Orders));
             Changed(nameof(Products));
 
             UpdateDashboard();
-            BuildReport();
 
             MessageBox.Show("Заказ отменён.");
         }
@@ -642,7 +718,9 @@ namespace TaroVS.ViewModels
 
             int totalOrders = Orders.Count;
             int newOrders = Orders.Count(x => x.Status == "Новый");
-            int activeOrders = Orders.Count(x => x.Status == "Новый" || x.Status == "В сборке");
+            int activeOrders = Orders.Count(x =>
+                x.Status == "Новый" ||
+                x.Status == "В сборке");
             int sentOrders = Orders.Count(x => x.Status == "Отправлен");
             int closedOrders = Orders.Count(x => x.Status == "Закрыт");
             int canceledOrders = Orders.Count(x => x.Status == "Отмена");
